@@ -220,8 +220,8 @@ class BookingsTests {
 }
 ```
 
-Page tests and `@SpringBootTest` start the whole application, so there the real implementation
-answers.
+Page tests (`@WicketTest`) and `@SpringBootTest` start the whole application, so there the real
+implementation answers.
 
 ## Page tests
 
@@ -230,37 +230,30 @@ page works (markup and `wicket:id`s match, `@SpringBean` injection works, Ajax u
 component), not the business rules, which the requirement tests already cover. So they carry no
 requirement id unless a requirement is genuinely about the UI.
 
+`@WicketTest`, from the starter's test starter (see `setup.md`), is `@SpringBootTest` plus a
+`WicketTester` for each test: declare it as a parameter of the `@Test` method (or of a
+`@BeforeEach`, which then gets the same one). It runs a new instance of `WicketApplication`, with
+`@SpringBean` injection, and is destroyed after the test. No servlet container starts.
+
 ```java
 package com.acme.shop.ordering;
 
 /// Renders the page in the whole application: proves markup, wicket:ids
 /// and injection fit together. The rules themselves are proven in `OrdersTests`.
-@SpringBootTest
+@WicketTest
 @Import(TestcontainersConfiguration.class)
 class OrdersPageTests {
 
-    @Autowired ApplicationContext context;
     @Autowired Orders orders;
     @Autowired OrderRepository repository;
 
-    WicketTester tester;
-
     @BeforeEach
-    void startWicket() {
+    void startEmpty() {
         repository.deleteAll();
-        var application = new WicketApplication();
-        application.getComponentInstantiationListeners()
-            .add(new SpringComponentInjector(application, context));
-        tester = new WicketTester(application);
-    }
-
-    @AfterEach
-    void stopWicket() {
-        tester.destroy();
     }
 
     @Test
-    void listsOpenOrders() {
+    void listsOpenOrders(WicketTester tester) {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
 
         tester.startPage(OrdersPage.class);
@@ -270,7 +263,7 @@ class OrdersPageTests {
     }
 
     @Test
-    void shipsAnOrderFromTheList() {
+    void shipsAnOrderFromTheList(WicketTester tester) {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
         tester.startPage(OrdersPage.class);
 
@@ -282,15 +275,17 @@ class OrdersPageTests {
 }
 ```
 
-`WicketTester` needs the `wicket-tester` test dependency (see `setup.md`). Component paths are
-the `wicket:id`s joined with `:`, with list items numbered from 0.
+The tester runs the application's own `WebApplication` bean, so `WicketApplication` has to be a
+`@Component` (see `layout.md`). Without one, the starter's placeholder application answers instead,
+and `WicketOats.install` never runs. Component paths are the `wicket:id`s joined with `:`, with list
+items numbered from 0.
 
 A form (see "Forms" in `layout.md`) is filled through a `FormTester`. Oat fields are panels, so
 the value goes to `<field id>:input`, and the Ajax submit button is clicked with an event:
 
 ```java
 @Test
-void addsARoomFromTheForm() {
+void addsARoomFromTheForm(WicketTester tester) {
     tester.startPage(RoomsPage.class);
 
     var form = tester.newFormTester("add");
@@ -310,29 +305,12 @@ The root's `StartPage` has no slice of its own, so give it a small test of its o
 broken link or missing markup there never shows up in `verify`:
 
 ```java
-@SpringBootTest
+@WicketTest
 @Import(TestcontainersConfiguration.class)
 class StartPageTests {
 
-    @Autowired ApplicationContext context;
-
-    WicketTester tester;
-
-    @BeforeEach
-    void startWicket() {
-        var application = new WicketApplication();
-        application.getComponentInstantiationListeners()
-            .add(new SpringComponentInjector(application, context));
-        tester = new WicketTester(application);
-    }
-
-    @AfterEach
-    void stopWicket() {
-        tester.destroy();
-    }
-
     @Test
-    void linksToEverySlice() {
+    void linksToEverySlice(WicketTester tester) {
         tester.startPage(StartPage.class);
 
         tester.assertRenderedPage(StartPage.class);
@@ -349,8 +327,8 @@ class StartPageTests {
 | `@ApplicationModuleTest`, `Scenario` | `org.springframework.modulith.test` |
 | `@MockitoBean` | `org.springframework.test.context.bean.override.mockito` |
 | `AopTestUtils` | `org.springframework.test.util` |
+| `@WicketTest` | `dev.jbaby.wicket.springboot.test` |
 | `WicketTester`, `FormTester` | `org.apache.wicket.util.tester` |
-| `SpringComponentInjector` | `org.apache.wicket.spring.injection.annot` |
 | `PageParameters` | `org.apache.wicket.request.mapper.parameter` |
 
 ## Architecture and traceability
@@ -379,4 +357,5 @@ package once per project, and adjust the `package` line and the application clas
 | `Cannot define class using reflection … As of Java 26` / `error while injecting object … Page` | The build runs on Java 26 or later. Switch to JDK 25 (see `setup.md`). |
 | A listener test sees no effect, or sees it only sometimes | The listener is asynchronous. Use `Scenario.publish(…).andWaitForStateChange(…)`, or call the target bean as shown under [Repeated delivery](#repeated-delivery). |
 | `Could not find a valid Docker environment` | Testcontainers needs a running Docker (or compatible) daemon. |
+| `No ParameterResolver registered for parameter [… WicketTester …]` | The test class has `@SpringBootTest` instead of `@WicketTest`. |
 | `MarkupNotFoundException` | The page's HTML is missing, misnamed, or not under `src/main/resources/<package path>/`. A stale copy in `target/classes` can hide this until the next `clean`. |

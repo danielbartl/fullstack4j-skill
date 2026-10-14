@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>dev.jbaby</groupId>
 			<artifactId>wicket-spring-boot-starter</artifactId>
-			<version>0.1.0</version>
+			<version>0.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>dev.jbaby</groupId>
@@ -56,9 +56,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.wicket</groupId>
-			<artifactId>wicket-tester</artifactId>
-			<version>${wicket.version}</version>
+			<groupId>dev.jbaby</groupId>
+			<artifactId>wicket-spring-boot-starter-test</artifactId>
+			<version>0.2.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

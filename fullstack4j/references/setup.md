@@ -20,7 +20,8 @@ unzip shop.zip
 ```
 
 Or pick the same options at https://start.fullstack4j.dev. Pass the Java version explicitly; the
-generator's default is older than 25.
+generator's default is older than 25. With `wicket`, the generator adds the Wicket Spring Boot
+Starter and, in test scope, its test starter.
 
 ## JDK 25
 
@@ -94,7 +95,7 @@ Check that the pom has the following, and add what's missing:
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>wicket-spring-boot-starter</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 <dependency>
     <groupId>dev.jbaby</groupId>
@@ -112,11 +113,11 @@ Check that the pom has the following, and add what's missing:
     <artifactId>spring-modulith-starter-mongodb</artifactId>
 </dependency>
 
-<!-- Tests -->
+<!-- Tests: WicketTester and @WicketTest, at the starter's version -->
 <dependency>
-    <groupId>org.apache.wicket</groupId>
-    <artifactId>wicket-tester</artifactId>
-    <version>${wicket.version}</version>
+    <groupId>dev.jbaby</groupId>
+    <artifactId>wicket-spring-boot-starter-test</artifactId>
+    <version>0.2.0</version>
     <scope>test</scope>
 </dependency>
 <dependency>
@@ -151,8 +152,10 @@ Check that the pom has the following, and add what's missing:
 </dependencyManagement>
 ```
 
-`wicket-tester` is a separate artifact since Wicket 10; without it `WicketTester` doesn't
-compile. ArchUnit comes in through Spring Modulith; it needs no dependency of its own.
+The test starter brings Wicket's `wicket-tester` at the Wicket version of the starter, Spring
+Boot's test starter, and `@WicketTest` for page tests (see `testing.md`). Keep both starters on the
+same version, and don't add `wicket-tester` on its own. ArchUnit comes in through Spring Modulith;
+it needs no dependency of its own.
 
 ## MongoDB and Testcontainers
 
