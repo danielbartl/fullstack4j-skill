@@ -1,0 +1,28 @@
+name: example
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Wicket 10.11 can't create its @SpringBean proxies on Java 26+, so pin 25
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Skill assets match the example
+        run: |
+          for f in ArchitectureTests SpecTraceabilityTests TestcontainersConfiguration; do
+            diff -u "example/src/test/java/com/acme/shop/$f.java" "fullstack4j/assets/$f.java"
+          done
+
+      - name: Build and test the example
+        working-directory: example
+        run: ./mvnw -B verify
