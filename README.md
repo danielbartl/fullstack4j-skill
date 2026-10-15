@@ -102,7 +102,7 @@ knows the Oat components, themes and layout classes.
 fullstack4j/            the skill
 ├── SKILL.md            rules and the new/apply workflow
 ├── references/         spec format, slice layout, testing, project setup
-└── assets/             ArchitectureTests, SpecTraceabilityTests, TestcontainersConfiguration
+└── assets/             ArchitectureTests, SpecTraceabilityTests
 example/                the shop from the screenshots, built with the skill's rules
 docs/screenshots/
 ```
@@ -137,6 +137,8 @@ other JDK with a message saying so.
 
 - [fullstack4j.dev](https://fullstack4j.dev): the approach and the offering
 - [fullstack4j start](https://github.com/danielbartl/fullstack4j-start): the project generator
+- [fullstack4j Spring Boot Starter](https://github.com/danielbartl/fullstack4j-spring-boot-starter):
+  the whole stack in two dependencies
 - [Wicket Spring Boot Starter](https://github.com/danielbartl/wicket-spring-boot-starter)
 - [Wicket Oat](https://github.com/danielbartl/wicket-oat): components and themes for Wicket
 

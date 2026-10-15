@@ -19,7 +19,7 @@ jobs:
 
       - name: Skill assets match the example
         run: |
-          for f in ArchitectureTests SpecTraceabilityTests TestcontainersConfiguration; do
+          for f in ArchitectureTests SpecTraceabilityTests; do
             diff -u "example/src/test/java/com/acme/shop/$f.java" "fullstack4j/assets/$f.java"
           done
 

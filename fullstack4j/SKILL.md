@@ -132,7 +132,6 @@ src/main/resources/com/acme/shop/ordering/OrdersPage.html    markup, same packag
 src/test/java/com/acme/shop/
 ├── ArchitectureTests.java     Spring Modulith verify() + ArchUnit rules
 ├── SpecTraceabilityTests.java every Rn.m has a test, every test has an Rn.m
-├── TestcontainersConfiguration.java
 └── ordering/OrdersTests.java  one @Test per requirement id
 ```
 
@@ -164,9 +163,8 @@ Read them when the step calls for them, not all up front.
   `verify` fails.
 - [references/setup.md](references/setup.md): starting a new project, the JDK, the pom, MongoDB
   and Testcontainers settings. Read when setting up a project or when the build itself breaks.
-- `assets/`: `ArchitectureTests.java`, `SpecTraceabilityTests.java` and
-  `TestcontainersConfiguration.java`, ready to copy into a project's root test package. Adjust
-  the `package` line and the application class name.
+- `assets/`: `ArchitectureTests.java` and `SpecTraceabilityTests.java`, ready to copy into a
+  project's root test package. Adjust the `package` line and the application class name.
 
 For the page UI itself (buttons, forms, toasts, themes), use the `wicket-oat` skill if it is
 installed. The spec format follows SBCE by Adam Bien (sbce.space), without its

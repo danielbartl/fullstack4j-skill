@@ -3,10 +3,10 @@ package com.acme.shop.ordering;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.acme.shop.TestcontainersConfiguration;
 import com.acme.shop.ordering.internal.Order;
 import com.acme.shop.ordering.internal.OrderRepository;
 import com.acme.shop.ordering.internal.Orders;
+import dev.jbaby.fullstack4j.springboot.test.MongoDbReplicaSetConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ import org.springframework.modulith.test.Scenario;
 /// Each test starts with the id of the requirement it proves.
 /// The requirements live in this slice's `package-info.java`.
 @ApplicationModuleTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class OrdersTests {
 
     static final List<Order.Line> ONE_WIDGET = List.of(new Order.Line("Widget", 1));

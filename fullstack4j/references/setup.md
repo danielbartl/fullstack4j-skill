@@ -11,17 +11,22 @@
 
 ## Generate the project
 
-Use the fullstack4j generator, a Spring Initializr with Wicket on board:
+Use the fullstack4j generator, a Spring Initializr with the fullstack4j stack on board:
 
 ```bash
 curl https://start.fullstack4j.dev/starter.zip -o shop.zip \
-     -d javaVersion=25 -d dependencies=wicket,data-mongodb,testcontainers,modulith
+     -d javaVersion=25 -d dependencies=fullstack4j
 unzip shop.zip
 ```
 
 Or pick the same options at https://start.fullstack4j.dev. Pass the Java version explicitly; the
-generator's default is older than 25. With `wicket`, the generator adds the Wicket Spring Boot
-Starter and, in test scope, its test starter.
+generator's default is older than 25. With `fullstack4j`, the generator adds the fullstack4j
+starter and, in test scope, its test starter (see [The pom](#the-pom)). It also generates a
+test application to run the app with (`TestShopApplication` in this guide) and an application
+test, both already using a MongoDB replica set (see
+[MongoDB and Testcontainers](#mongodb-and-testcontainers)). Don't pick Wicket, MongoDB, Spring
+Modulith or Testcontainers as well: the starters bring all four, and the generator ignores them
+next to `fullstack4j`.
 
 ## JDK 25
 
@@ -85,96 +90,67 @@ Check that the pom has the following, and add what's missing:
 ```xml
 <properties>
     <java.version>25</java.version>
-    <spring-modulith.version>2.1.1</spring-modulith.version>
-    <wicket.version>10.11.0</wicket.version>
 </properties>
 ```
 
 ```xml
-<!-- Wicket on Spring Boot, plus Oat components for the UI -->
+<!-- Wicket with Wicket Oat, Spring Modulith and MongoDB, at versions that work together -->
 <dependency>
     <groupId>dev.jbaby</groupId>
-    <artifactId>wicket-spring-boot-starter</artifactId>
-    <version>0.2.0</version>
-</dependency>
-<dependency>
-    <groupId>dev.jbaby</groupId>
-    <artifactId>wicket-oat-core</artifactId>
-    <version>0.3.0</version>
+    <artifactId>fullstack4j-spring-boot-starter</artifactId>
+    <version>0.1.0</version>
 </dependency>
 
-<!-- Spring Modulith, with its event publication registry in MongoDB -->
-<dependency>
-    <groupId>org.springframework.modulith</groupId>
-    <artifactId>spring-modulith-starter-core</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.modulith</groupId>
-    <artifactId>spring-modulith-starter-mongodb</artifactId>
-</dependency>
-
-<!-- Tests: WicketTester and @WicketTest, at the starter's version -->
+<!-- Tests: WicketTester and @WicketTest, Spring Modulith's test support, Testcontainers
+     and MongoDbReplicaSetConfiguration -->
 <dependency>
     <groupId>dev.jbaby</groupId>
-    <artifactId>wicket-spring-boot-starter-test</artifactId>
-    <version>0.2.0</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.springframework.modulith</groupId>
-    <artifactId>spring-modulith-starter-test</artifactId>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>testcontainers-mongodb</artifactId>
+    <artifactId>fullstack4j-spring-boot-starter-test</artifactId>
+    <version>0.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
 
-```xml
-<dependencyManagement>
-    <dependencies>
-        <!-- Wicket Oat pulls in an older wicket-extensions; keep all Wicket artifacts on one version -->
-        <dependency>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-extensions</artifactId>
-            <version>${wicket.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.modulith</groupId>
-            <artifactId>spring-modulith-bom</artifactId>
-            <version>${spring-modulith.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-```
+These two are all the stack needs: no version properties and no `dependencyManagement`. The
+parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.1.x are built for Spring Boot 4.1.
 
-The test starter brings Wicket's `wicket-tester` at the Wicket version of the starter, Spring
-Boot's test starter, and `@WicketTest` for page tests (see `testing.md`). Keep both starters on the
-same version, and don't add `wicket-tester` on its own. ArchUnit comes in through Spring Modulith;
-it needs no dependency of its own.
+- `fullstack4j-spring-boot-starter` brings the Wicket Spring Boot Starter, Wicket Oat, Spring
+  Data MongoDB and Spring Modulith with its event publication registry in MongoDB. It keeps all
+  Wicket artifacts on the one version the Wicket starter is built for (Wicket Oat on its own
+  would pull in an older `wicket-extensions`), and picks the Spring Modulith line that goes
+  with Spring Boot 4.1.
+- `fullstack4j-spring-boot-starter-test` brings Wicket's `wicket-tester`, Spring Boot's test
+  starter, `@WicketTest` for page tests (see `testing.md`), Spring Modulith's test support with
+  ArchUnit, Testcontainers, and `MongoDbReplicaSetConfiguration`.
+
+Keep both starters on the same version, and don't add any of the libraries they bring on its own:
+a second declaration can pull a Wicket or Spring Modulith artifact off the version the starters
+chose.
+
+A project set up before the starters existed lists all of this separately. Replace it with the
+two starters: remove the dependencies on Wicket, Wicket Oat, Spring Modulith, MongoDB and
+Testcontainers and their test starters, the `wicket-extensions` and `spring-modulith-bom`
+entries in `dependencyManagement`, and the `spring-modulith.version` and `wicket.version`
+properties. Then follow the next section for the test configuration.
 
 ## MongoDB and Testcontainers
 
-`src/main/resources/application.properties`:
-
-```properties
-spring.application.name=shop
-
-# Spring Modulith's event publication registry stores UUIDs
-spring.mongodb.representation.uuid=standard
-```
-
-Without the UUID setting, publishing the first event fails with "The uuidRepresentation has not
-been specified". Spring Boot 4 names the property `spring.mongodb.representation.uuid`; the old
+Spring Modulith's event publication registry stores UUIDs, and the MongoDB driver refuses to
+write them until the UUID representation is set. The starter sets
+`spring.mongodb.representation.uuid=standard` as a default, so `application.properties` needs
+nothing for it; a value set there still wins. If publishing the first event fails with "The
+uuidRepresentation has not been specified", the starter is missing or something overrides the
+setting. Spring Boot 4 names the property `spring.mongodb.representation.uuid`; the old
 `spring.data.mongodb.uuid-representation` is no longer supported.
 
-Replace the generated test configuration with `assets/TestcontainersConfiguration.java`:
-`mongo:8` started as a **replica set**. MongoDB only supports transactions on a replica set, and
-Spring Modulith runs every `@ApplicationModuleListener` in a transaction.
+Tests and the development run get their database from `MongoDbReplicaSetConfiguration`, which the
+test starter brings (package `dev.jbaby.fullstack4j.springboot.test`): `mongo:8` in Docker,
+started as a **replica set**. MongoDB only supports transactions on a replica set, and Spring
+Modulith runs every `@ApplicationModuleListener` in a transaction. Every test that touches
+MongoDB imports it with `@Import(MongoDbReplicaSetConfiguration.class)` (see `testing.md`). Don't
+write a test configuration with a MongoDB container of your own; if the project already has one,
+such as a `TestcontainersConfiguration` from an earlier setup, delete it and import
+`MongoDbReplicaSetConfiguration` wherever it was imported.
 
 `TestShopApplication` (generated in the root test package) starts the app on a throwaway MongoDB
 in Docker:
@@ -182,7 +158,7 @@ in Docker:
 ```java
 public static void main(String[] args) {
     SpringApplication.from(ShopApplication::main)
-        .with(TestcontainersConfiguration.class)
+        .with(MongoDbReplicaSetConfiguration.class)
         .run(args);
 }
 ```
@@ -214,7 +190,7 @@ class DemoData {
 
 ```java
 SpringApplication.from(ShopApplication::main)
-    .with(TestcontainersConfiguration.class, DemoData.class)
+    .with(MongoDbReplicaSetConfiguration.class, DemoData.class)
     .run(args);
 ```
 

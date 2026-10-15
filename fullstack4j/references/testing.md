@@ -10,9 +10,9 @@ Four kinds of test, all run by `./mvnw verify`:
 | `SpecTraceabilityTests` | every `Rn.m` has a test, every test id has an `Rn.m` | root test package |
 
 Every test that touches MongoDB runs against a real MongoDB in Docker via Testcontainers
-(`TestcontainersConfiguration` in `assets/`). There are no mocks of repositories and no
-in-memory database, so what passes here also works in production. The one thing a requirement
-test does replace is another slice's interface: see
+(`MongoDbReplicaSetConfiguration` from the test starter, see `setup.md`). There are no mocks of
+repositories and no in-memory database, so what passes here also works in production. The one
+thing a requirement test does replace is another slice's interface: see
 [A slice that calls another](#a-slice-that-calls-another).
 
 Test code may use any slice's `internal` types: `verify()` and the ArchUnit rules only check
@@ -48,7 +48,7 @@ package com.acme.shop.ordering;
 /// Each test starts with the id of the requirement it proves.
 /// The requirements live in this slice's `package-info.java`.
 @ApplicationModuleTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class OrdersTests {
 
     static final List<Order.Line> ONE_WIDGET = List.of(new Order.Line("Widget", 1));
@@ -119,7 +119,7 @@ and fix it in the test, so the requirement no longer depends on the day the buil
 
 ```java
 @ApplicationModuleTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class BookingsTests {
 
     @TestConfiguration
@@ -200,7 +200,7 @@ slice's tests independent of the other slice's rules, which that slice's own tes
 /// Only this slice is bootstrapped, so `rooms` is stood in for by a mock of
 /// `BookableRooms`, the one thing this slice asks it.
 @ApplicationModuleTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class BookingsTests {
 
     static final BookableRoom ATLAS = new BookableRoom("atlas", "Atlas", 8);
@@ -241,7 +241,7 @@ package com.acme.shop.ordering;
 /// Renders the page in the whole application: proves markup, wicket:ids
 /// and injection fit together. The rules themselves are proven in `OrdersTests`.
 @WicketTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class OrdersPageTests {
 
     @Autowired Orders orders;
@@ -306,7 +306,7 @@ broken link or missing markup there never shows up in `verify`:
 
 ```java
 @WicketTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class StartPageTests {
 
     @Test
@@ -327,6 +327,7 @@ class StartPageTests {
 | `@ApplicationModuleTest`, `Scenario` | `org.springframework.modulith.test` |
 | `@MockitoBean` | `org.springframework.test.context.bean.override.mockito` |
 | `AopTestUtils` | `org.springframework.test.util` |
+| `MongoDbReplicaSetConfiguration` | `dev.jbaby.fullstack4j.springboot.test` |
 | `@WicketTest` | `dev.jbaby.wicket.springboot.test` |
 | `WicketTester`, `FormTester` | `org.apache.wicket.util.tester` |
 | `PageParameters` | `org.apache.wicket.request.mapper.parameter` |
@@ -353,7 +354,7 @@ package once per project, and adjust the `package` line and the application clas
 | `Cycle detected` | Two slices depend on each other. Turn one direction into an event. |
 | `[ordering: requirements without a test]` … `R2.3` | Write the test for that id in that slice. While you apply several slices one by one, the ones you haven't reached yet show up here too; that's expected. |
 | `[ordering: tests without a requirement]` … `R4.1` | A test names an id the spec doesn't have. Ask the user: declare it in the spec, or remove the test. |
-| `uuidRepresentation has not been specified` | Add `spring.mongodb.representation.uuid=standard` to `application.properties` (see `setup.md`). |
+| `uuidRepresentation has not been specified` | The fullstack4j starter is missing from the pom, or a property overrides its `spring.mongodb.representation.uuid=standard` (see `setup.md`). |
 | `Cannot define class using reflection … As of Java 26` / `error while injecting object … Page` | The build runs on Java 26 or later. Switch to JDK 25 (see `setup.md`). |
 | A listener test sees no effect, or sees it only sometimes | The listener is asynchronous. Use `Scenario.publish(…).andWaitForStateChange(…)`, or call the target bean as shown under [Repeated delivery](#repeated-delivery). |
 | `Could not find a valid Docker environment` | Testcontainers needs a running Docker (or compatible) daemon. |

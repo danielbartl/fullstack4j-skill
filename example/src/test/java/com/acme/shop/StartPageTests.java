@@ -2,6 +2,7 @@ package com.acme.shop;
 
 import com.acme.shop.billing.InvoicesPage;
 import com.acme.shop.ordering.OrdersPage;
+import dev.jbaby.fullstack4j.springboot.test.MongoDbReplicaSetConfiguration;
 import dev.jbaby.wicket.springboot.test.WicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTester;
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 @WicketTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class StartPageTests {
 
     @Test

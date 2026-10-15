@@ -2,10 +2,10 @@ package com.acme.shop.ordering;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.acme.shop.TestcontainersConfiguration;
 import com.acme.shop.ordering.internal.Order;
 import com.acme.shop.ordering.internal.OrderRepository;
 import com.acme.shop.ordering.internal.Orders;
+import dev.jbaby.fullstack4j.springboot.test.MongoDbReplicaSetConfiguration;
 import dev.jbaby.wicket.springboot.test.WicketTest;
 import java.util.List;
 import org.apache.wicket.util.tester.WicketTester;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 /// Renders the page in the whole application: proves markup, wicket:ids
 /// and injection fit together. The rules themselves are proven in `OrdersTests`.
 @WicketTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class OrdersPageTests {
 
     @Autowired Orders orders;

@@ -2,11 +2,11 @@ package com.acme.shop.billing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.acme.shop.TestcontainersConfiguration;
 import com.acme.shop.billing.internal.Invoice;
 import com.acme.shop.billing.internal.InvoiceRepository;
 import com.acme.shop.billing.internal.Invoices;
 import com.acme.shop.ordering.OrderShipped;
+import dev.jbaby.fullstack4j.springboot.test.MongoDbReplicaSetConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.springframework.test.util.AopTestUtils;
 /// Each test starts with the id of the requirement it proves.
 /// The requirements live in this slice's `package-info.java`.
 @ApplicationModuleTest
-@Import(TestcontainersConfiguration.class)
+@Import(MongoDbReplicaSetConfiguration.class)
 class InvoicesTests {
 
     @Autowired Invoices invoices;
