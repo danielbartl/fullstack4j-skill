@@ -98,7 +98,7 @@ Check that the pom has the following, and add what's missing:
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 
 <!-- Tests: WicketTester and @WicketTest, Spring Modulith's test support, Testcontainers
@@ -106,13 +106,13 @@ Check that the pom has the following, and add what's missing:
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter-test</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <scope>test</scope>
 </dependency>
 ```
 
 These two are all the stack needs: no version properties and no `dependencyManagement`. The
-parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.1.x are built for Spring Boot 4.1.
+parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.2.x are built for Spring Boot 4.1.
 
 - `fullstack4j-spring-boot-starter` brings the Wicket Spring Boot Starter, Wicket Oat, Spring
   Data MongoDB and Spring Modulith with its event publication registry in MongoDB. It keeps all
