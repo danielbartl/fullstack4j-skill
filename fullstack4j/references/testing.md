@@ -6,7 +6,7 @@ Four kinds of test, all run by `./mvnw verify`:
 |---|---|---|
 | Requirement tests | each `Rn.m` of a slice's spec | `src/test/java/<base>/<slice>/<Facade>Tests.java` |
 | Page tests | markup, `wicket:id`s and injection fit together | `src/test/java/<base>/<slice>/<Page>Tests.java` |
-| `ArchitectureTests` | slices stay out of each other's `internal`, no cycles, UI never touches repositories | root test package |
+| `ArchitectureTests` | slices stay out of each other's `internal`, no cycles, and the fullstack4j rules: what a slice holds, how events travel, what pages keep, no `@Disabled` | root test package |
 | `SpecTraceabilityTests` | every `Rn.m` has a test, every test id has an `Rn.m` | root test package |
 
 Every test that touches MongoDB runs against a real MongoDB in Docker via Testcontainers
@@ -15,8 +15,8 @@ repositories and no in-memory database, so what passes here also works in produc
 thing a requirement test does replace is another slice's interface: see
 [A slice that calls another](#a-slice-that-calls-another).
 
-Test code may use any slice's `internal` types: `verify()` and the ArchUnit rules only check
-main code. A slice's tests use its own facade and repository; a page test or seed data may use
+Test code may use any slice's `internal` types: `verify()` and the fullstack4j rules only check
+main code, apart from the rule against `@Disabled`. A slice's tests use its own facade and repository; a page test or seed data may use
 another slice's facade to set things up.
 
 Run one test class while you work (`./mvnw test -Dtest=OrdersTests`, with JDK 25 set as in
@@ -35,6 +35,7 @@ Run one test class while you work (`./mvnw test -Dtest=OrdersTests`, with JDK 25
 - [Imports](#imports)
 - [Architecture and traceability](#architecture-and-traceability)
 - [When verify fails](#when-verify-fails)
+- [When the fullstack4j rules fail](#when-the-fullstack4j-rules-fail)
 
 ## Requirement tests
 
@@ -340,7 +341,9 @@ package once per project, and adjust the `package` line and the application clas
 - `slicesStayOutOfEachOthersInternals`: Spring Modulith's `verify()`. Fails on cycles between
   slices, on any use of another slice's `internal` package (from the root too), and on
   dependencies missing from `allowedDependencies`.
-- `uiNeverTouchesRepositories`: no Wicket component depends on a Spring Data repository.
+- `followsTheFullstack4jRules`: `Fullstack4jRules` from the test starter, run with Taikai. It
+  checks what `verify()` leaves alone and reports every violation in one run; the rules and
+  their fixes are under [When the fullstack4j rules fail](#when-the-fullstack4j-rules-fail).
 - `documentsTheArchitecture`: writes PlantUML and AsciiDoc module docs to
   `target/spring-modulith-docs`.
 - `SpecTraceabilityTests`: one dynamic test per slice with requirements, failing on gaps and drift.
@@ -360,3 +363,26 @@ package once per project, and adjust the `package` line and the application clas
 | `Could not find a valid Docker environment` | Testcontainers needs a running Docker (or compatible) daemon. |
 | `No ParameterResolver registered for parameter [… WicketTester …]` | The test class has `@SpringBootTest` instead of `@WicketTest`. |
 | `MarkupNotFoundException` | The page's HTML is missing, misnamed, or not under `src/main/resources/<package path>/`. A stale copy in `target/classes` can hide this until the next `clean`. |
+
+## When the fullstack4j rules fail
+
+`followsTheFullstack4jRules` fails with `Found N Taikai violations for M rules!`, then one
+`Rule: …` line per broken rule, followed by its violations. Find each violation below. Fix the
+code: don't exclude classes, drop a rule or edit `ArchitectureTests` to get past it. If a
+violation looks deliberate, ask the user.
+
+| Violation | Meaning and fix |
+|---|---|
+| `… is in slice shared, which isn't named after a business capability` | The package is named after a technical layer (`web`, `shared`, `util`, `config`, …). Move its classes into the slice that owns the concept, or propose a new slice named after a business capability to the user. |
+| `… is in ordering.web, but below a slice there is only ordering.internal` | Move the class to `ordering` if other slices need it (see `layout.md`, What goes where), otherwise to `ordering.internal`. |
+| `… is in the base package of billing, but is no Wicket component, interface, record or enum` | A facade, helper or other class sits in the slice's public API. Move it to `billing.internal`. |
+| `Class <…> does not reside in a package '….*.internal..'` | A `@Document` is outside its slice's `internal`. Move it there. If another slice needs its data, publish an event or offer an interface with a record. |
+| `no classes that are in a slice's base package or assignable to org.apache.wicket.Component should depend on classes that are repositories …` | A page, or a type in a slice's base package, uses a repository, Spring Data or the MongoDB driver. Give the facade a method for it and call that. |
+| `… listens to …, which is a document` or `…, which isn't a record` | Listen to an event record from the publishing slice's base package. An event carries ids and values, never a document. |
+| `… creates com.acme.shop.ordering.OrderShipped, an event of ordering` | Only `ordering` may publish `OrderShipped`. To make `ordering` act, call an interface it offers (`layout.md`, Direct calls between slices). If none fits, ask the user whether the spec is missing an operation. |
+| `Field <…Page.order> has raw type a document or a record that isn't Serializable` | The page keeps a document between requests. Keep its id and load it through the facade or a `LoadableDetachableModel`. A field named `val$order` is a local variable captured by an anonymous component: capture the id instead. |
+| `….OrdersPage.refresh() is annotated with @Transactional` (or a page with `@Component`, `@Async`, `@EventListener`) | Spring never manages a page, so the annotation does nothing. Move the work to the facade and call it from the page. |
+| `Classes should not have names matching .*(Service\|Impl\|Dto)` | Rename the class after what it holds or carries (`Orders`, `OrderSummary`). Update the spec's `## Operations` if it names the class. |
+| `No fields should be annotated with …Autowired` | Use constructor injection. Pages get beans through `@SpringBean`. |
+| `… the self-invocation bypasses the Spring proxy …` | A bean calls its own `@Transactional`, `@Async` or listener method, so the annotation doesn't apply to that call. Move the shared work into a private method and call that from both places. |
+| `Methods should not be annotated with org.junit.jupiter.api.Disabled` (or `Classes …`) | Make the test pass. If its requirement is gone, delete the test and ask the user about the spec. |

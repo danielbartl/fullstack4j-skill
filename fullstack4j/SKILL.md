@@ -29,8 +29,9 @@ that loop: declare the spec with the user, then change the code until `./mvnw ve
    return. Everything else (the use-case facade, documents, repositories, helpers) goes in
    `<slice>.internal`. This is Spring Modulith's default, and `verify()` fails as soon as code
    outside a slice, the application's root package included, touches its `internal` package.
-   Test code is exempt: `verify()` only checks main code, so a slice's tests use its `internal`
-   types freely.
+   The fullstack4j rules in `ArchitectureTests` fail when anything else lands in the base
+   package. Test code is exempt: both only check main code, so a slice's tests use its
+   `internal` types freely.
 4. **Events first, calls when needed.** Slices react to each other's events, so the publisher
    never needs to know who listens. When an event doesn't fit (a page has to show another
    slice's data right now), the called slice offers an interface and the records it returns in
@@ -39,7 +40,9 @@ that loop: declare the spec with the user, then change the code until `./mvnw ve
 5. **Every requirement has a test, every test has a requirement.** Each id `Rn.m` in a spec has
    at least one test whose `@DisplayName` starts with that id, and no test names an id the spec
    doesn't have. `SpecTraceabilityTests` checks both directions and fails the build on a gap or
-   on drift.
+   on drift. Fix a failing test or delete it with its requirement; never switch it off.
+   `ArchitectureTests` fails on `@Disabled`, because a disabled test would still count as
+   proving its id.
 6. **Done means `./mvnw verify` is green on JDK 25.** Not your own judgement: run it, read the
    failures, fix, run again. Use JDK 25 specifically, because Wicket 10.11 cannot create its
    `@SpringBean` proxies on Java 26 and later. Your shell may not keep state between commands,
@@ -130,7 +133,7 @@ src/main/java/com/acme/shop/
 └── billing/
 src/main/resources/com/acme/shop/ordering/OrdersPage.html    markup, same package as the page
 src/test/java/com/acme/shop/
-├── ArchitectureTests.java     Spring Modulith verify() + ArchUnit rules
+├── ArchitectureTests.java     Spring Modulith verify() + the fullstack4j rules
 ├── SpecTraceabilityTests.java every Rn.m has a test, every test has an Rn.m
 └── ordering/OrdersTests.java  one @Test per requirement id
 ```
@@ -143,7 +146,9 @@ there. Details, naming and code shapes are in [references/layout.md](references/
 - `./mvnw verify` is green on JDK 25, and you ran it after your last change.
 - Every requirement id in the spec has a test, and every test id is in the spec
   (`SpecTraceabilityTests` passed).
-- No code outside the slice uses its `internal` package (`ArchitectureTests` passed).
+- `ArchitectureTests` passed: no code outside a slice uses its `internal` package, and the
+  fullstack4j rules hold. You fixed what they reported and silenced nothing: no class excluded,
+  no rule removed, no test disabled.
 - New shared types live in the base package on purpose: events, pages, or interfaces with
   records. Nothing ended up there just to silence `verify()`.
 - The spec still describes what the code does. Anything you found that the spec doesn't cover is
@@ -159,8 +164,8 @@ Read them when the step calls for them, not all up front.
   facades, documents, repositories, pages, events, listeners and direct calls. Read before
   adding classes to a slice or wiring slices together.
 - [references/testing.md](references/testing.md): test recipes (requirement tests, events,
-  asynchronous listeners, pages) and what common failures mean. Read before writing tests or when
-  `verify` fails.
+  asynchronous listeners, pages) and what common failures mean, each fullstack4j rule included.
+  Read before writing tests or when `verify` fails.
 - [references/setup.md](references/setup.md): starting a new project, the JDK, the pom, MongoDB
   and Testcontainers settings. Read when setting up a project or when the build itself breaks.
 - `assets/`: `ArchitectureTests.java` and `SpecTraceabilityTests.java`, ready to copy into a

@@ -44,6 +44,7 @@ dozens of classes. If it does, consider splitting the slice instead.
 - Slice: one lowercase business word (`ordering`, `billing`, `shipping`).
 - Facade: the plural of what the slice manages (`Orders`, `Invoices`). No `*Service`,
   `*Manager` or `*Impl`: the name says what the class is about, not what technical role it plays.
+  `ArchitectureTests` rejects `*Service`, `*Impl` and `*Dto`.
 - Document: the singular noun (`Order`, `Invoice`). Repository: `<Document>Repository`.
 - Page: `<Thing>Page` (`OrdersPage`), markup `<Thing>Page.html`.
 - Event: what happened, in the past tense (`OrderShipped`, `InvoiceRaised`).
@@ -213,7 +214,10 @@ because the build only copies resources from `src/main/resources`:
   (`String id = order.id()`), read lists through `LoadableDetachableModel` (it drops its value
   after each request), and keep only `Serializable` values in other models. Documents and
   another slice's records aren't `Serializable`; for a dropdown of them, map to a small
-  page-local `record Choice(String id, String label) implements Serializable`.
+  page-local `record Choice(String id, String label) implements Serializable`. `ArchitectureTests`
+  fails on a page field, or a value captured by an anonymous component, that holds a document.
+- Pages carry no Spring annotations (`@Transactional`, `@Async`, …): Spring never manages a page,
+  so they would do nothing. That work belongs on the facade.
 - Mount each page in `WicketApplication` and link it from `StartPage` (see below).
 - To link back to the start page, use
   `new BookmarkablePageLink<>("home", getApplication().getHomePage())`. Don't import `StartPage`:

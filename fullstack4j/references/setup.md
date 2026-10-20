@@ -98,21 +98,21 @@ Check that the pom has the following, and add what's missing:
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 
-<!-- Tests: WicketTester and @WicketTest, Spring Modulith's test support, Testcontainers
-     and MongoDbReplicaSetConfiguration -->
+<!-- Tests: WicketTester and @WicketTest, Spring Modulith's test support, Testcontainers,
+     MongoDbReplicaSetConfiguration and the fullstack4j rules -->
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter-test</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <scope>test</scope>
 </dependency>
 ```
 
 These two are all the stack needs: no version properties and no `dependencyManagement`. The
-parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.2.x are built for Spring Boot 4.1.
+parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.3.x are built for Spring Boot 4.1.
 
 - `fullstack4j-spring-boot-starter` brings the Wicket Spring Boot Starter, Wicket Oat, Spring
   Data MongoDB and Spring Modulith with its event publication registry in MongoDB. It keeps all
@@ -121,7 +121,8 @@ parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.2.x are built fo
   with Spring Boot 4.1.
 - `fullstack4j-spring-boot-starter-test` brings Wicket's `wicket-tester`, Spring Boot's test
   starter, `@WicketTest` for page tests (see `testing.md`), Spring Modulith's test support with
-  ArchUnit, Testcontainers, and `MongoDbReplicaSetConfiguration`.
+  ArchUnit, Testcontainers, `MongoDbReplicaSetConfiguration`, and `Fullstack4jRules`, the
+  architecture rules `ArchitectureTests` runs with Taikai.
 
 Keep both starters on the same version, and don't add any of the libraries they bring on its own:
 a second declaration can pull a Wicket or Spring Modulith artifact off the version the starters
@@ -206,8 +207,9 @@ a heading and an empty `<nav>`; each slice adds its link later. Give it a test r
 (`StartPageTests` in `testing.md`). The generated `ShopApplication` stays as it is.
 
 Copy `assets/ArchitectureTests.java` and `assets/SpecTraceabilityTests.java` into the root test
-package. In `ArchitectureTests`, adjust the `package` line, `ShopApplication.class` and the
-package passed to `importPackages`; `SpecTraceabilityTests` only needs the `package` line.
+package. In `ArchitectureTests`, adjust the `package` line and `ShopApplication.class`;
+`SpecTraceabilityTests` only needs the `package` line. The fullstack4j rules pass on a project
+without slices, so `ArchitectureTests` is green from the first build.
 
 ## First green build
 

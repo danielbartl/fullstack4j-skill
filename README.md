@@ -76,6 +76,9 @@ The rules it works by:
   and records in the called slice's base package, never through its documents.
 - Every requirement has a test and every test has a requirement; `SpecTraceabilityTests` fails
   the build on a gap or drift.
+- `ArchitectureTests` runs `verify()` and the fullstack4j rules from the starter's test starter.
+  They check what a slice's public package holds, where documents live, how events travel, what
+  pages keep between requests, and that no test is switched off.
 - Done means `./mvnw verify` is green on JDK 25.
 
 ## Install
