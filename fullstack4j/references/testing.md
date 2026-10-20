@@ -361,6 +361,7 @@ package once per project, and adjust the `package` line and the application clas
 | `Cannot define class using reflection … As of Java 26` / `error while injecting object … Page` | The build runs on Java 26 or later. Switch to JDK 25 (see `setup.md`). |
 | A listener test sees no effect, or sees it only sometimes | The listener is asynchronous. Use `Scenario.publish(…).andWaitForStateChange(…)`, or call the target bean as shown under [Repeated delivery](#repeated-delivery). |
 | `Could not find a valid Docker environment` | Testcontainers needs a running Docker (or compatible) daemon. |
+| `Container startup failed for image mongo:8.0`, and the container log says `Linux kernel versions 6.19 and newer has a known incompatibility` | The kernel running Docker is between 6.19 and 7.0.13, which MongoDB 8 refuses (`uname -r`). Not a code problem: tell the user. Until the kernel is 7.0.14 or later, run the build with `FULLSTACK4J_TEST_MONGODB_IMAGE=mongo:7.0`. Don't switch to MongoDB 9.0 or 8.2; they start but have the same bug. |
 | `No ParameterResolver registered for parameter [… WicketTester …]` | The test class has `@SpringBootTest` instead of `@WicketTest`. |
 | `MarkupNotFoundException` | The page's HTML is missing, misnamed, or not under `src/main/resources/<package path>/`. A stale copy in `target/classes` can hide this until the next `clean`. |
 

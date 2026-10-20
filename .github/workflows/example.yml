@@ -6,7 +6,10 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    # Not ubuntu-latest for now: its kernel (7.0.0 in image 20261018) is one MongoDB 8 refuses to
+    # start on, from 6.19 up to 7.0.13 (https://jira.mongodb.org/browse/SERVER-125742). Go back
+    # once the 24.04 image ships kernel 7.0.14 or later.
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
