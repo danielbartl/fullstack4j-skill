@@ -26,6 +26,13 @@ jobs:
             diff -u "example/src/test/java/com/acme/shop/$f.java" "fullstack4j/assets/$f.java"
           done
 
+      # Errors fail the build. The one warning, "No version specified", is deliberate: without
+      # a version, plugin users follow this repository's commits
+      - name: Validate the plugin and the marketplace
+        run: |
+          npx -y @anthropic-ai/claude-code@2.1.306 plugin validate .
+          npx -y @anthropic-ai/claude-code@2.1.306 plugin validate ./fullstack4j
+
       - name: Build and test the example
         working-directory: example
         run: ./mvnw -B verify

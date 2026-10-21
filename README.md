@@ -83,7 +83,26 @@ The rules it works by:
 
 ## Install
 
-With Claude Code:
+With Claude Code, as a plugin from this repository's marketplace:
+
+```bash
+claude plugin marketplace add danielbartl/fullstack4j-skill
+claude plugin install fullstack4j@fullstack4j
+```
+
+Inside a session, `/plugin marketplace add danielbartl/fullstack4j-skill` and
+`/plugin install fullstack4j@fullstack4j` do the same. The plugin brings the
+[Wicket Oat skill](https://github.com/danielbartl/wicket-oat) with it, which knows the Oat
+components, themes and layout classes the pages are built with. Invoke the skill as
+`/fullstack4j new <slice>` or `/fullstack4j apply <slice>`, or just describe the feature: Claude
+picks the skill up by itself. If another command is already called `fullstack4j`, use
+`/fullstack4j:fullstack4j`.
+
+The plugin follows this repository's commits. To get the latest, run
+`/plugin marketplace update fullstack4j`, or turn on auto-update for the marketplace under
+**Marketplaces** in `/plugin`.
+
+Without the plugin, copy the skill folder instead:
 
 ```bash
 # for all your projects
@@ -93,16 +112,17 @@ cp -r fullstack4j ~/.claude/skills/fullstack4j
 cp -r fullstack4j <your-project>/.claude/skills/fullstack4j
 ```
 
-Other agents: point them at the `fullstack4j/` folder, or copy it to wherever your agent looks
-for skills.
-
-For the UI itself, add the [Wicket Oat skill](https://github.com/danielbartl/wicket-oat) too: it
-knows the Oat components, themes and layout classes.
+Add the [Wicket Oat skill](https://github.com/danielbartl/wicket-oat) the same way. Other agents:
+point them at the `fullstack4j/` folder, or copy it to wherever your agent looks for skills.
 
 ## What's in here
 
 ```
-fullstack4j/            the skill
+.claude-plugin/
+└── marketplace.json    the marketplace: the fullstack4j plugin and Wicket Oat
+fullstack4j/            the skill, and the plugin
+├── .claude-plugin/
+│   └── plugin.json     plugin metadata, Wicket Oat as a dependency
 ├── SKILL.md            rules and the new/apply workflow
 ├── references/         spec format, slice layout, testing, project setup
 └── assets/             ArchitectureTests, SpecTraceabilityTests
@@ -111,7 +131,8 @@ docs/screenshots/
 ```
 
 CI builds the example and checks that the files in `fullstack4j/assets/` are identical to the
-example's, so what the skill hands out is what passes there.
+example's, so what the skill hands out is what passes there. It also validates the plugin and
+the marketplace with `claude plugin validate`.
 
 ## How it was tested
 

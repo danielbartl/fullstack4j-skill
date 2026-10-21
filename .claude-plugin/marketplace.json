@@ -1,0 +1,34 @@
+{
+  "name": "fullstack4j",
+  "description": "The fullstack4j skill and the Wicket Oat skill it builds pages with.",
+  "owner": {
+    "name": "Daniel Bartl",
+    "url": "https://github.com/danielbartl"
+  },
+  "plugins": [
+    {
+      "name": "fullstack4j",
+      "source": "./fullstack4j",
+      "description": "Build and change features in a fullstack4j application: declare a slice's spec, then make the code match it until ./mvnw verify is green.",
+      "category": "development"
+    },
+    {
+      "name": "wicket-oat",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/danielbartl/wicket-oat.git",
+        "path": "wicket-oat"
+      },
+      "description": "Wicket Oat, the themeable component library for Apache Wicket: buttons, forms, cards, dialogs, tabs, toasts and themes.",
+      "author": {
+        "name": "Daniel Bartl",
+        "url": "https://github.com/danielbartl"
+      },
+      "homepage": "https://github.com/danielbartl/wicket-oat",
+      "repository": "https://github.com/danielbartl/wicket-oat",
+      "license": "MIT",
+      "keywords": ["java", "wicket", "ui", "components", "themes"],
+      "category": "development"
+    }
+  ]
+}

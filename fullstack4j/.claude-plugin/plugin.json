@@ -1,0 +1,13 @@
+{
+  "name": "fullstack4j",
+  "description": "Build business applications in plain Java with Spring Boot, Apache Wicket, Spring Modulith and MongoDB: one slice per feature, each with its own spec in package-info.java, tests for every requirement, and ./mvnw verify as the definition of done.",
+  "author": {
+    "name": "Daniel Bartl",
+    "url": "https://github.com/danielbartl"
+  },
+  "homepage": "https://fullstack4j.dev",
+  "repository": "https://github.com/danielbartl/fullstack4j-skill",
+  "license": "MIT",
+  "keywords": ["java", "spring-boot", "wicket", "spring-modulith", "mongodb", "spec-driven", "ears"],
+  "dependencies": ["wicket-oat"]
+}
