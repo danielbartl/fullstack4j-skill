@@ -249,7 +249,7 @@ form.add(OatSubmitButton.onSubmit("submit", "Add room", ajax -> {
     } catch (IllegalArgumentException | IllegalStateException rejected) {
         Oat.toast(ajax, rejected.getMessage(), OatVariant.DANGER);
     }
-}, ajax -> ajax.add(form)));
+}));
 ```
 
 ```html
@@ -260,9 +260,9 @@ form.add(OatSubmitButton.onSubmit("submit", "Add room", ajax -> {
 </form>
 ```
 
-The second lambda runs when validation fails (a required field is empty) and re-renders the
-form with its messages. The page catches the slice's rejections and shows them; the rules
-themselves stay in the facade and the documents.
+When validation fails (a required field is empty), each Oat field shows its message by itself,
+without the form being re-rendered, so it needs no second lambda. The page catches the slice's
+rejections and shows them; the rules themselves stay in the facade and the documents.
 
 ## Events
 
