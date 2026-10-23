@@ -94,7 +94,7 @@ Inside a session, `/plugin marketplace add danielbartl/fullstack4j-skill` and
 `/plugin install fullstack4j@fullstack4j` do the same. The plugin brings the
 [Wicket Oat skill](https://github.com/danielbartl/wicket-oat) with it, which knows the Oat
 components, themes and layout classes the pages are built with. It is the skill of the Wicket Oat
-release the fullstack4j starter ships, 0.5.0, so its advice fits your project's Wicket Oat; it
+release the fullstack4j starter ships, 0.6.0, so its advice fits your project's Wicket Oat; it
 moves on with the starter. Invoke the skill as
 `/fullstack4j new <slice>` or `/fullstack4j apply <slice>`, or just describe the feature: Claude
 picks the skill up by itself. If another command is already called `fullstack4j`, use

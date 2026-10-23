@@ -18,8 +18,8 @@
         "source": "git-subdir",
         "url": "https://github.com/danielbartl/wicket-oat.git",
         "path": "wicket-oat",
-        "ref": "master",
-        "sha": "1b3b114a35e75c5e7c2e3aacad25a52d00b24cf2"
+        "ref": "v0.6.0",
+        "sha": "46e30e887f9249b6dfe67f71a67c4bd60121e94d"
       },
       "description": "Wicket Oat, the themeable component library for Apache Wicket: buttons, forms, cards, dialogs, tabs, toasts and themes.",
       "author": {
