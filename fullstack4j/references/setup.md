@@ -15,12 +15,15 @@ Use the fullstack4j generator, a Spring Initializr with the fullstack4j stack on
 
 ```bash
 curl https://start.fullstack4j.dev/starter.zip -o shop.zip \
-     -d javaVersion=25 -d dependencies=fullstack4j
+     -d javaVersion=25 -d dependencies=fullstack4j \
+     -d groupId=com.acme -d artifactId=shop -d name=shop -d packageName=com.acme.shop
 unzip shop.zip
 ```
 
 Or pick the same options at https://start.fullstack4j.dev. Pass the Java version explicitly; the
-generator's default is older than 25. With `fullstack4j`, the generator adds the fullstack4j
+generator's default is older than 25. Put the project's own group, name and package in the last
+line; with the ones above, the generated classes are the `ShopApplication` and
+`TestShopApplication` this guide uses. With `fullstack4j`, the generator adds the fullstack4j
 starter and, in test scope, its test starter (see [The pom](#the-pom)). It also generates a
 test application to run the app with (`TestShopApplication` in this guide) and an application
 test, both already using a MongoDB replica set (see
