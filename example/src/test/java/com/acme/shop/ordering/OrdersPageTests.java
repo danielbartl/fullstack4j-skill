@@ -1,13 +1,18 @@
 package com.acme.shop.ordering;
 
+import static dev.jbaby.wicket.testkit.locator.Locator.locate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.acme.shop.ordering.internal.Order;
 import com.acme.shop.ordering.internal.OrderRepository;
 import com.acme.shop.ordering.internal.Orders;
 import dev.jbaby.fullstack4j.springboot.test.MongoDbReplicaSetConfiguration;
+import dev.jbaby.wicket.oat.components.OatButton;
 import dev.jbaby.wicket.springboot.test.WicketTest;
+import dev.jbaby.wicket.testkit.WicketTestkit;
 import java.util.List;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,29 +28,37 @@ class OrdersPageTests {
     @Autowired Orders orders;
     @Autowired OrderRepository repository;
 
+    WicketTester tester;
+    WicketTestkit kit;
+
     @BeforeEach
-    void startEmpty() {
+    void startEmpty(WicketTester tester) {
         repository.deleteAll();
+        this.tester = tester;
+        this.kit = WicketTestkit.of(tester);
     }
 
     @Test
-    void listsOpenOrders(WicketTester tester) {
+    void listsOpenOrders() {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
 
         tester.startPage(OrdersPage.class);
 
         tester.assertRenderedPage(OrdersPage.class);
-        tester.assertLabel("list:orders:0:customer", "ACME");
+        kit.assertRows(locate(ListView.class).withId("orders"), """
+            | customer |
+            | ACME     |
+            """);
     }
 
     @Test
-    void shipsAnOrderFromTheList(WicketTester tester) {
-        orders.place("ACME", List.of(new Order.Line("Widget", 1)));
+    void shipsAnOrderFromTheList() {
+        var order = orders.place("ACME", List.of(new Order.Line("Widget", 1)));
         tester.startPage(OrdersPage.class);
 
-        tester.clickLink("list:orders:0:ship");
+        kit.click(locate(OatButton.class).withId("ship").inRowOf(order));
 
-        tester.assertComponentOnAjaxResponse("list");
+        kit.assertOnAjaxResponse(locate(WebMarkupContainer.class).withId("list"));
         assertThat(orders.open()).isEmpty();
     }
 }

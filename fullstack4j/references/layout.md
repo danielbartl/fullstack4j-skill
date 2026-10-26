@@ -227,8 +227,8 @@ because the build only copies resources from `src/main/resources`:
 
 ### Forms
 
-A form with Oat fields and an Ajax submit button. Oat fields are panels; the actual input sits
-at `<field id>:input`, which matters in page tests:
+A form with Oat fields and an Ajax submit button. Oat fields are panels that hand their label to
+the actual input inside them, so page tests find the input by its label (see `testing.md`):
 
 ```java
 var name = new Model<String>();

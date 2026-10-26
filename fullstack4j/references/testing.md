@@ -236,6 +236,13 @@ requirement id unless a requirement is genuinely about the UI.
 `@BeforeEach`, which then gets the same one). It runs a new instance of `WicketApplication`, with
 `@SpringBean` injection, and is destroyed after the test. No servlet container starts.
 
+Wrap the tester in wicket-testkit (`dev.jbaby:wicket-testkit`, see `setup.md`) and find
+components with locators: by type, `wicket:id`, label and the row of a list. Don't address them
+by component paths such as `"list:orders:0:ship"`. A path spells out the whole tree on the way to
+the component, so a container wrapped around the list breaks it, and a row index silently checks
+the wrong row once the order changes. For the testkit's API and what its failure messages ask you
+to change, use the `wicket-testkit` skill if it is installed.
+
 ```java
 package com.acme.shop.ordering;
 
@@ -248,57 +255,77 @@ class OrdersPageTests {
     @Autowired Orders orders;
     @Autowired OrderRepository repository;
 
+    WicketTester tester;
+    WicketTestkit kit;
+
     @BeforeEach
-    void startEmpty() {
+    void startEmpty(WicketTester tester) {
         repository.deleteAll();
+        this.tester = tester;
+        this.kit = WicketTestkit.of(tester);
     }
 
     @Test
-    void listsOpenOrders(WicketTester tester) {
+    void listsOpenOrders() {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
 
         tester.startPage(OrdersPage.class);
 
         tester.assertRenderedPage(OrdersPage.class);
-        tester.assertLabel("list:orders:0:customer", "ACME");
+        kit.assertRows(locate(ListView.class).withId("orders"), """
+            | customer |
+            | ACME     |
+            """);
     }
 
     @Test
-    void shipsAnOrderFromTheList(WicketTester tester) {
-        orders.place("ACME", List.of(new Order.Line("Widget", 1)));
+    void shipsAnOrderFromTheList() {
+        var order = orders.place("ACME", List.of(new Order.Line("Widget", 1)));
         tester.startPage(OrdersPage.class);
 
-        tester.clickLink("list:orders:0:ship");
+        kit.click(locate(OatButton.class).withId("ship").inRowOf(order));
 
-        tester.assertComponentOnAjaxResponse("list");
+        kit.assertOnAjaxResponse(locate(WebMarkupContainer.class).withId("list"));
         assertThat(orders.open()).isEmpty();
     }
 }
 ```
 
+- `inRowOf(order)` finds the row whose element equals the order. Documents are records, so that
+  works as long as every field reads back unchanged. MongoDB keeps an `Instant` only to the
+  millisecond, so for a document with a timestamp set, match the row by id:
+  `inRowOf(Order.class, o -> o.id().equals(id), "has id " + id)`.
+- `assertRows` compares a list's rows with a table whose header names the `wicket:id`s to read,
+  in the order the page shows them. When the order matters, sort in the query.
+- Every locator has to match exactly one component. For "none", use `kit.assertCount(locator, 0)`.
+- For a `WicketTester` method the testkit doesn't wrap, pass it `kit.pathOf(locator)`.
+
 The tester runs the application's own `WebApplication` bean, so `WicketApplication` has to be a
 `@Component` (see `layout.md`). Without one, the starter's placeholder application answers instead,
-and `WicketOats.install` never runs. Component paths are the `wicket:id`s joined with `:`, with list
-items numbered from 0.
+and `WicketOats.install` never runs.
 
-A form (see "Forms" in `layout.md`) is filled through a `FormTester`. Oat fields are panels, so
-the value goes to `<field id>:input`, and the Ajax submit button is clicked with an event:
+A form (see "Forms" in `layout.md`) is filled through the testkit's form helper. An Oat field is a
+panel that hands its label to the input inside it, so find the input by its label. An
+`OatSubmitButton` is an `AjaxButton`, so `submit` sends the form through Ajax:
 
 ```java
 @Test
-void addsARoomFromTheForm(WicketTester tester) {
+void addsARoomFromTheForm() {
     tester.startPage(RoomsPage.class);
 
-    var form = tester.newFormTester("add");
-    form.setValue("name:input", "Atlas");
-    form.setValue("capacity:input", "8");
-    tester.executeAjaxEvent("add:submit", "click");
+    kit.form(locate(Form.class).withId("add"))
+        .set(locate(TextField.class).withLabel("Name"), "Atlas")
+        .set(locate(TextField.class).withLabel("Capacity"), "8")
+        .submit(locate(OatSubmitButton.class).withId("submit"));
 
-    tester.assertComponentOnAjaxResponse("list");
+    kit.assertOnAjaxResponse(locate(WebMarkupContainer.class).withId("list"));
     assertThat(rooms.all()).extracting(Room::name, Room::capacity)
         .containsExactly(tuple("Atlas", 8));
 }
 ```
+
+A required field left empty shows its message on the field itself; check it there with
+`kit.assertFeedbackOn(locate(TextField.class).withLabel("Name"), "'Name' is required.")`.
 
 ## Start page
 
@@ -312,11 +339,14 @@ class StartPageTests {
 
     @Test
     void linksToEverySlice(WicketTester tester) {
+        var kit = WicketTestkit.of(tester);
         tester.startPage(StartPage.class);
 
         tester.assertRenderedPage(StartPage.class);
-        tester.assertBookmarkablePageLink("orders", OrdersPage.class, new PageParameters());
-        tester.assertBookmarkablePageLink("invoices", InvoicesPage.class, new PageParameters());
+        tester.assertBookmarkablePageLink(kit.pathOf(locate(BookmarkablePageLink.class).withId("orders")),
+            OrdersPage.class, new PageParameters());
+        tester.assertBookmarkablePageLink(kit.pathOf(locate(BookmarkablePageLink.class).withId("invoices")),
+            InvoicesPage.class, new PageParameters());
     }
 }
 ```
@@ -330,7 +360,10 @@ class StartPageTests {
 | `AopTestUtils` | `org.springframework.test.util` |
 | `MongoDbReplicaSetConfiguration` | `dev.jbaby.fullstack4j.springboot.test` |
 | `@WicketTest` | `dev.jbaby.wicket.springboot.test` |
-| `WicketTester`, `FormTester` | `org.apache.wicket.util.tester` |
+| `WicketTester` | `org.apache.wicket.util.tester` |
+| `WicketTestkit` | `dev.jbaby.wicket.testkit` |
+| `locate` (static import from `Locator`) | `dev.jbaby.wicket.testkit.locator` |
+| `OatButton`, `OatSubmitButton` | `dev.jbaby.wicket.oat.components` |
 | `PageParameters` | `org.apache.wicket.request.mapper.parameter` |
 
 ## Architecture and traceability

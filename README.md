@@ -95,21 +95,17 @@ Inside a session, `/plugin marketplace add danielbartl/fullstack4j-skill` and
 [Wicket Oat skill](https://github.com/danielbartl/wicket-oat) with it, which knows the Oat
 components, themes and layout classes the pages are built with. It is the skill of the Wicket Oat
 release the fullstack4j starter ships, 0.6.0, so its advice fits your project's Wicket Oat; it
-moves on with the starter. Invoke the skill as
+moves on with the starter. It also brings the
+[wicket-testkit skill](https://github.com/danielbartl/wicket-testkit), for the page tests, which
+find components by type, `wicket:id`, label and row instead of by WicketTester paths; it is the
+skill of wicket-testkit 0.2.0, the version `setup.md` adds to the pom. Invoke the skill as
 `/fullstack4j new <slice>` or `/fullstack4j apply <slice>`, or just describe the feature: Claude
 picks the skill up by itself. If another command is already called `fullstack4j`, use
 `/fullstack4j:fullstack4j`.
 
-The marketplace also has the [wicket-testkit skill](https://github.com/danielbartl/wicket-testkit)
-for page tests that find components by type, `wicket:id`, label and row instead of by
-WicketTester paths. It isn't part of the fullstack4j plugin; install it on its own:
-
-```bash
-claude plugin install wicket-testkit@fullstack4j
-```
-
-It is the skill of wicket-testkit 0.2.0, so add `dev.jbaby:wicket-testkit:0.2.0` in test scope
-to the projects you use it in.
+For Wicket projects that don't follow fullstack4j, install the wicket-testkit skill on its own
+with `claude plugin install wicket-testkit@fullstack4j`, and add
+`dev.jbaby:wicket-testkit:0.2.0` in test scope to the project.
 
 The plugin follows this repository's commits. To get the latest, run
 `/plugin marketplace update fullstack4j`, or turn on auto-update for the marketplace under
@@ -136,7 +132,7 @@ point them at the `fullstack4j/` folder, or copy it to wherever your agent looks
 └── marketplace.json    the marketplace: the fullstack4j plugin, Wicket Oat and wicket-testkit
 fullstack4j/            the skill, and the plugin
 ├── .claude-plugin/
-│   └── plugin.json     plugin metadata, Wicket Oat as a dependency
+│   └── plugin.json     plugin metadata, Wicket Oat and wicket-testkit as dependencies
 ├── SKILL.md            rules and the new/apply workflow
 ├── references/         spec format, slice layout, testing, project setup
 └── assets/             ArchitectureTests, SpecTraceabilityTests

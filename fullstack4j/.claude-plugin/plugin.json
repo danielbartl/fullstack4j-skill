@@ -9,5 +9,5 @@
   "repository": "https://github.com/danielbartl/fullstack4j-skill",
   "license": "MIT",
   "keywords": ["java", "spring-boot", "wicket", "spring-modulith", "mongodb", "spec-driven", "ears"],
-  "dependencies": ["wicket-oat"]
+  "dependencies": ["wicket-oat", "wicket-testkit"]
 }

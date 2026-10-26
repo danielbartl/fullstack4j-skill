@@ -109,9 +109,17 @@ Check that the pom has the following, and add what's missing:
     <version>0.6.0</version>
     <scope>test</scope>
 </dependency>
+
+<!-- Page tests: find components by what they are instead of by path -->
+<dependency>
+    <groupId>dev.jbaby</groupId>
+    <artifactId>wicket-testkit</artifactId>
+    <version>0.2.0</version>
+    <scope>test</scope>
+</dependency>
 ```
 
-These two are all the stack needs: no version properties and no `dependencyManagement`. The
+The two starters are all the stack needs: no version properties and no `dependencyManagement`. The
 parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.6.x are built for Spring Boot 4.1.
 
 - `fullstack4j-spring-boot-starter` brings the Wicket Spring Boot Starter, Wicket Oat, Spring
@@ -123,6 +131,9 @@ parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.6.x are built fo
   starter, `@WicketTest` for page tests (see `testing.md`), Spring Modulith's test support with
   ArchUnit, Testcontainers, `MongoDbReplicaSetConfiguration`, and `Fullstack4jRules`, the
   architecture rules `ArchitectureTests` runs with Taikai.
+- `wicket-testkit` is what page tests find components with (see `testing.md`). It brings no
+  dependencies of its own and uses the `wicket-core` and `wicket-tester` the starters bring, so
+  it stays on their Wicket version.
 
 Keep both starters on the same version, and don't add any of the libraries they bring on its own:
 a second declaration can pull a Wicket or Spring Modulith artifact off the version the starters

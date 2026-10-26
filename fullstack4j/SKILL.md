@@ -172,5 +172,5 @@ Read them when the step calls for them, not all up front.
   project's root test package. Adjust the `package` line and the application class name.
 
 For the page UI itself (buttons, forms, toasts, themes), use the `wicket-oat` skill if it is
-installed. The spec format follows SBCE by Adam Bien (sbce.space), without its
+installed, and for page tests the `wicket-testkit` skill. The spec format follows SBCE by Adam Bien (sbce.space), without its
 boundary/control/entity layout, and the requirements use EARS by Alistair Mavin.
