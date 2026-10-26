@@ -100,6 +100,17 @@ moves on with the starter. Invoke the skill as
 picks the skill up by itself. If another command is already called `fullstack4j`, use
 `/fullstack4j:fullstack4j`.
 
+The marketplace also has the [wicket-testkit skill](https://github.com/danielbartl/wicket-testkit)
+for page tests that find components by type, `wicket:id`, label and row instead of by
+WicketTester paths. It isn't part of the fullstack4j plugin; install it on its own:
+
+```bash
+claude plugin install wicket-testkit@fullstack4j
+```
+
+It is the skill of wicket-testkit 0.2.0, so add `dev.jbaby:wicket-testkit:0.2.0` in test scope
+to the projects you use it in.
+
 The plugin follows this repository's commits. To get the latest, run
 `/plugin marketplace update fullstack4j`, or turn on auto-update for the marketplace under
 **Marketplaces** in `/plugin`.
@@ -114,14 +125,15 @@ cp -r fullstack4j ~/.claude/skills/fullstack4j
 cp -r fullstack4j <your-project>/.claude/skills/fullstack4j
 ```
 
-Add the [Wicket Oat skill](https://github.com/danielbartl/wicket-oat) the same way. Other agents:
+Add the [Wicket Oat](https://github.com/danielbartl/wicket-oat) and
+[wicket-testkit](https://github.com/danielbartl/wicket-testkit) skills the same way. Other agents:
 point them at the `fullstack4j/` folder, or copy it to wherever your agent looks for skills.
 
 ## What's in here
 
 ```
 .claude-plugin/
-└── marketplace.json    the marketplace: the fullstack4j plugin and Wicket Oat
+└── marketplace.json    the marketplace: the fullstack4j plugin, Wicket Oat and wicket-testkit
 fullstack4j/            the skill, and the plugin
 ├── .claude-plugin/
 │   └── plugin.json     plugin metadata, Wicket Oat as a dependency
@@ -167,6 +179,8 @@ other JDK with a message saying so.
   the whole stack in two dependencies
 - [Wicket Spring Boot Starter](https://github.com/danielbartl/wicket-spring-boot-starter)
 - [Wicket Oat](https://github.com/danielbartl/wicket-oat): components and themes for Wicket
+- [wicket-testkit](https://github.com/danielbartl/wicket-testkit): Wicket tests by locators
+  instead of paths
 
 ## Credits
 

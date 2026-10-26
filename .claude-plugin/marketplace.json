@@ -1,6 +1,6 @@
 {
   "name": "fullstack4j",
-  "description": "The fullstack4j skill and the Wicket Oat skill it builds pages with.",
+  "description": "The fullstack4j skill, the Wicket Oat skill it builds pages with, and the wicket-testkit skill for page tests.",
   "owner": {
     "name": "Daniel Bartl",
     "url": "https://github.com/danielbartl"
@@ -30,6 +30,26 @@
       "repository": "https://github.com/danielbartl/wicket-oat",
       "license": "MIT",
       "keywords": ["java", "wicket", "ui", "components", "themes"],
+      "category": "development"
+    },
+    {
+      "name": "wicket-testkit",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/danielbartl/wicket-testkit.git",
+        "path": "wicket-testkit",
+        "ref": "v0.2.0",
+        "sha": "ec7909ef72a6cf565322d8d1df4bac0e0ee428f0"
+      },
+      "description": "wicket-testkit, test helpers for Apache Wicket: locate components by type, wicket:id, label, model object and row instead of WicketTester paths, fill in forms, and compare rows with example tables.",
+      "author": {
+        "name": "Daniel Bartl",
+        "url": "https://github.com/danielbartl"
+      },
+      "homepage": "https://danielbartl.github.io/wicket-testkit/",
+      "repository": "https://github.com/danielbartl/wicket-testkit",
+      "license": "Apache-2.0",
+      "keywords": ["java", "wicket", "testing", "wickettester", "page-objects"],
       "category": "development"
     }
   ]
