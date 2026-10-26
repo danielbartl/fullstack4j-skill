@@ -98,7 +98,8 @@ release the fullstack4j starter ships, 0.6.0, so its advice fits your project's 
 moves on with the starter. It also brings the
 [wicket-testkit skill](https://github.com/danielbartl/wicket-testkit), for the page tests, which
 find components by type, `wicket:id`, label and row instead of by WicketTester paths; it is the
-skill of wicket-testkit 0.2.0, the version `setup.md` adds to the pom. Invoke the skill as
+skill of wicket-testkit 0.2.0, the version the fullstack4j test starter 0.7.0 brings. Invoke the
+skill as
 `/fullstack4j new <slice>` or `/fullstack4j apply <slice>`, or just describe the feature: Claude
 picks the skill up by itself. If another command is already called `fullstack4j`, use
 `/fullstack4j:fullstack4j`.

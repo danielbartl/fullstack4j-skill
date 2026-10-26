@@ -28,18 +28,13 @@ class OrdersPageTests {
     @Autowired Orders orders;
     @Autowired OrderRepository repository;
 
-    WicketTester tester;
-    WicketTestkit kit;
-
     @BeforeEach
-    void startEmpty(WicketTester tester) {
+    void startEmpty() {
         repository.deleteAll();
-        this.tester = tester;
-        this.kit = WicketTestkit.of(tester);
     }
 
     @Test
-    void listsOpenOrders() {
+    void listsOpenOrders(WicketTester tester, WicketTestkit kit) {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
 
         tester.startPage(OrdersPage.class);
@@ -52,7 +47,7 @@ class OrdersPageTests {
     }
 
     @Test
-    void shipsAnOrderFromTheList() {
+    void shipsAnOrderFromTheList(WicketTester tester, WicketTestkit kit) {
         var order = orders.place("ACME", List.of(new Order.Line("Widget", 1)));
         tester.startPage(OrdersPage.class);
 

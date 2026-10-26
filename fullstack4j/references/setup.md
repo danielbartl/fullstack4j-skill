@@ -98,29 +98,21 @@ Check that the pom has the following, and add what's missing:
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
 </dependency>
 
-<!-- Tests: WicketTester and @WicketTest, Spring Modulith's test support, Testcontainers,
-     MongoDbReplicaSetConfiguration and the fullstack4j rules -->
+<!-- Tests: WicketTester, wicket-testkit and @WicketTest, Spring Modulith's test support,
+     Testcontainers, MongoDbReplicaSetConfiguration and the fullstack4j rules -->
 <dependency>
     <groupId>dev.jbaby</groupId>
     <artifactId>fullstack4j-spring-boot-starter-test</artifactId>
-    <version>0.6.0</version>
-    <scope>test</scope>
-</dependency>
-
-<!-- Page tests: find components by what they are instead of by path -->
-<dependency>
-    <groupId>dev.jbaby</groupId>
-    <artifactId>wicket-testkit</artifactId>
-    <version>0.2.0</version>
+    <version>0.7.0</version>
     <scope>test</scope>
 </dependency>
 ```
 
-The two starters are all the stack needs: no version properties and no `dependencyManagement`. The
-parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.6.x are built for Spring Boot 4.1.
+These two are all the stack needs: no version properties and no `dependencyManagement`. The
+parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.7.x are built for Spring Boot 4.1.
 
 - `fullstack4j-spring-boot-starter` brings the Wicket Spring Boot Starter, Wicket Oat, Spring
   Data MongoDB and Spring Modulith with its event publication registry in MongoDB. It keeps all
@@ -128,12 +120,10 @@ parent stays `spring-boot-starter-parent` 4.1.x; the starters 0.6.x are built fo
   would pull in an older `wicket-extensions`), and picks the Spring Modulith line that goes
   with Spring Boot 4.1.
 - `fullstack4j-spring-boot-starter-test` brings Wicket's `wicket-tester`, Spring Boot's test
-  starter, `@WicketTest` for page tests (see `testing.md`), Spring Modulith's test support with
-  ArchUnit, Testcontainers, `MongoDbReplicaSetConfiguration`, and `Fullstack4jRules`, the
-  architecture rules `ArchitectureTests` runs with Taikai.
-- `wicket-testkit` is what page tests find components with (see `testing.md`). It brings no
-  dependencies of its own and uses the `wicket-core` and `wicket-tester` the starters bring, so
-  it stays on their Wicket version.
+  starter, `@WicketTest` for page tests with wicket-testkit to find components (see
+  `testing.md`), Spring Modulith's test support with ArchUnit, Testcontainers,
+  `MongoDbReplicaSetConfiguration`, and `Fullstack4jRules`, the architecture rules
+  `ArchitectureTests` runs with Taikai.
 
 Keep both starters on the same version, and don't add any of the libraries they bring on its own:
 a second declaration can pull a Wicket or Spring Modulith artifact off the version the starters

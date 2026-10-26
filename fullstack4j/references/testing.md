@@ -232,12 +232,13 @@ component), not the business rules, which the requirement tests already cover. S
 requirement id unless a requirement is genuinely about the UI.
 
 `@WicketTest`, from the starter's test starter (see `setup.md`), is `@SpringBootTest` plus a
-`WicketTester` for each test: declare it as a parameter of the `@Test` method (or of a
-`@BeforeEach`, which then gets the same one). It runs a new instance of `WicketApplication`, with
-`@SpringBean` injection, and is destroyed after the test. No servlet container starts.
+`WicketTester` and a `WicketTestkit` for each test: declare them as parameters of the `@Test`
+method (or of a `@BeforeEach`, which then gets the same ones). The tester runs a new instance of
+`WicketApplication`, with `@SpringBean` injection, and is destroyed after the test. No servlet
+container starts.
 
-Wrap the tester in wicket-testkit (`dev.jbaby:wicket-testkit`, see `setup.md`) and find
-components with locators: by type, `wicket:id`, label and the row of a list. Don't address them
+The testkit, from wicket-testkit, which the test starter brings, wraps that tester. Find
+components with its locators: by type, `wicket:id`, label and the row of a list. Don't address them
 by component paths such as `"list:orders:0:ship"`. A path spells out the whole tree on the way to
 the component, so a container wrapped around the list breaks it, and a row index silently checks
 the wrong row once the order changes. For the testkit's API and what its failure messages ask you
@@ -255,18 +256,13 @@ class OrdersPageTests {
     @Autowired Orders orders;
     @Autowired OrderRepository repository;
 
-    WicketTester tester;
-    WicketTestkit kit;
-
     @BeforeEach
-    void startEmpty(WicketTester tester) {
+    void startEmpty() {
         repository.deleteAll();
-        this.tester = tester;
-        this.kit = WicketTestkit.of(tester);
     }
 
     @Test
-    void listsOpenOrders() {
+    void listsOpenOrders(WicketTester tester, WicketTestkit kit) {
         orders.place("ACME", List.of(new Order.Line("Widget", 1)));
 
         tester.startPage(OrdersPage.class);
@@ -279,7 +275,7 @@ class OrdersPageTests {
     }
 
     @Test
-    void shipsAnOrderFromTheList() {
+    void shipsAnOrderFromTheList(WicketTester tester, WicketTestkit kit) {
         var order = orders.place("ACME", List.of(new Order.Line("Widget", 1)));
         tester.startPage(OrdersPage.class);
 
@@ -310,7 +306,7 @@ panel that hands its label to the input inside it, so find the input by its labe
 
 ```java
 @Test
-void addsARoomFromTheForm() {
+void addsARoomFromTheForm(WicketTester tester, WicketTestkit kit) {
     tester.startPage(RoomsPage.class);
 
     kit.form(locate(Form.class).withId("add"))
@@ -338,8 +334,7 @@ broken link or missing markup there never shows up in `verify`:
 class StartPageTests {
 
     @Test
-    void linksToEverySlice(WicketTester tester) {
-        var kit = WicketTestkit.of(tester);
+    void linksToEverySlice(WicketTester tester, WicketTestkit kit) {
         tester.startPage(StartPage.class);
 
         tester.assertRenderedPage(StartPage.class);

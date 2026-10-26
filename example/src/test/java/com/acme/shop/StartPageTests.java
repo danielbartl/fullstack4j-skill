@@ -18,8 +18,7 @@ import org.springframework.context.annotation.Import;
 class StartPageTests {
 
     @Test
-    void linksToEverySlice(WicketTester tester) {
-        var kit = WicketTestkit.of(tester);
+    void linksToEverySlice(WicketTester tester, WicketTestkit kit) {
         tester.startPage(StartPage.class);
 
         tester.assertRenderedPage(StartPage.class);
@@ -30,8 +29,7 @@ class StartPageTests {
     }
 
     @Test
-    void opensTheInvoices(WicketTester tester) {
-        var kit = WicketTestkit.of(tester);
+    void opensTheInvoices(WicketTester tester, WicketTestkit kit) {
         tester.startPage(StartPage.class);
 
         kit.click(locate(BookmarkablePageLink.class).withId("invoices"));
